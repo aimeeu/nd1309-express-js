@@ -23,7 +23,7 @@ class BlockAPI {
      * Initilization of the Express framework
      */
 	initExpress() {
-		this.app.set("port", 8000);
+		this.app.set("port", 9000);
 	}
 
     /**
@@ -54,3 +54,15 @@ class BlockAPI {
 }
 
 new BlockAPI();
+
+/*
+
+    1. The first part is the initialization of Express - initExpress(). In this method, we are setting the port where the server will respond to requests.
+
+    2. The method initExpressMiddleWare() helps you initialize all the middlewares for the framework.
+
+        Express is a routing and middleware web framework that has minimal functionality of its own: An Express application is essentially a series of middleware function calls. In this case, we are using body-parser middleware to be able to parse the body data as a JSON or urlencoded.
+
+    3. The method initControllers() allows us to initialize all of the controllers classes. In this case, we have only created one controller. If you have more controllers, you will need to initialized them here.
+
+ */

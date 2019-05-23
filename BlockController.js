@@ -1,5 +1,6 @@
 const SHA256 = require('crypto-js/sha256');
 const BlockClass = require('./Block.js');
+const utils = require('./utils.js');
 
 /**
  * Controller Definition to encapsulate routes to work with blocks
@@ -15,6 +16,7 @@ class BlockController {
         this.blocks = [];
         this.initializeMockData();
         this.getBlockByIndex();
+        this.getBlockchain();
         this.postNewBlock();
     }
 
@@ -24,6 +26,33 @@ class BlockController {
     getBlockByIndex() {
         this.app.get("/api/block/:index", (req, res) => {
             // Add your code here
+            //sends a JSON response. This method sends a response (with the correct content-type) that is the parameter converted to a JSON string using JSON.stringify().
+            //
+            // The parameter can be any JSON type, including object, array, string, Boolean, number, or null, and you can also use it to convert other values to JSON.
+            try {
+                let block = this.blocks[req.params.index];
+                if (block === undefined) {
+                   throw new Error('block not found!')
+                }
+                res.status(200).json(block);
+            } catch (e) {
+                console.log(e);
+                res.status(500).json( { error: 'Unable to retrieve block by index' } );
+            }
+
+        });
+    }
+
+    getBlockchain() {
+        this.app.get("/api/blockchain", (req, res) => {
+            // Add your code here
+            try {
+                console.log('blocks length ', this.blocks.length);
+                res.status(200).json(this.blocks);
+            } catch (e) {
+                res.status(500).json( { error: 'Unable to retrieve blockchain'} );
+            }
+
         });
     }
 
@@ -33,11 +62,21 @@ class BlockController {
     postNewBlock() {
         this.app.post("/api/block", (req, res) => {
             // Add your code here
+            try {
+                let data = req.body.data;
+                let newBlock = new BlockClass.Block(data);
+                newBlock.hash = utils.generateHashFor(newBlock);
+                this.blocks.push(newBlock);
+                res.status(200).json({ message: 'Block added!'});
+                console.log(this.blocks);
+            } catch (e) {
+                res.status(500).json( { error: 'Unable to add new block'} );
+            }
         });
     }
 
     /**
-     * Help method to inizialized Mock dataset, adds 10 test blocks to the blocks array
+     * Help method to initialize Mock dataset, adds 10 test blocks to the blocks array
      */
     initializeMockData() {
         if(this.blocks.length === 0){
@@ -48,12 +87,14 @@ class BlockController {
                 this.blocks.push(blockAux);
             }
         }
+        console.log('blocks: ', JSON.stringify(this.blocks).toString());
     }
-
 }
 
 /**
  * Exporting the BlockController class
  * @param {*} app 
  */
-module.exports = (app) => { return new BlockController(app);}
+module.exports = (app) => {
+    return new BlockController(app);
+};
