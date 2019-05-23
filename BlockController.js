@@ -63,7 +63,11 @@ class BlockController {
         this.app.post("/api/block", (req, res) => {
             // Add your code here
             try {
-                let data = req.body.data;
+                let data = req.body.body;
+                if (data === undefined || data.length === 0) {
+                    res.status(500).json( { error: 'Unable to add new block; body is empty'} );
+                }
+                console.log('adding new block');
                 let newBlock = new BlockClass.Block(data);
                 newBlock.hash = utils.generateHashFor(newBlock);
                 this.blocks.push(newBlock);
